@@ -4,7 +4,7 @@ body {
     flex-direction: column;
     align-items: center;
     margin: 0;
-    padding: 20px;
+    padding: 10px; /* Smaller padding for mobile */
     background-color: #1a1a1a; /* Very dark gray for room effect */
     color: #ecf0f1; /* Light text color */
     min-height: 100vh;
@@ -13,8 +13,9 @@ body {
 
 h1 {
     color: #f1c40f; /* Yellow accent */
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* Smaller margin */
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    font-size: 1.8em; /* Smaller font size for mobile */
 }
 
 #game-container {
@@ -92,6 +93,7 @@ h1 {
     gap: 50px;
     margin: 30px 0;
     width: 100%;
+    flex-wrap: wrap; /* Allow game area to wrap on smaller screens */
 }
 
 .card-pile {
@@ -117,8 +119,8 @@ h1 {
 }
 
 .card-image {
-    width: 170px; /* Ancho de la carta */
-    height: 261px; /* Alto de la carta */
+    width: 70px; /* Smaller default card width for mobile */
+    height: 105px; /* Smaller default card height for mobile */
     border: 2px solid #f1c40f;
     border-radius: 8px;
     box-shadow: 0 6px 12px rgba(0,0,0,0.5); /* More pronounced shadow for depth */
@@ -135,11 +137,12 @@ h1 {
 .card-image.playable {
     cursor: pointer;
     border-color: #2ecc71; /* Borde verde para cartas jugables */
-    box-shadow: 0 0 15px #2ecc71;
+    box-shadow: 0 0 20px 5px #2ecc71; /* More prominent glow */
+    transform: scale(1.03); /* Slightly larger to stand out */
 }
 
 .card-image.playable:hover {
-    transform: translateY(-5px) scale(1.05);
+    transform: translateY(-8px) scale(1.08); /* More pronounced hover effect */
 }
 
 
@@ -147,17 +150,17 @@ h1 {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 10px; /* Smaller gap for player hands on mobile */
     width: 100%;
 }
 
 .player-hand {
     border: 1px solid #555; /* Darker solid border */
-    padding: 15px;
+    padding: 10px; /* Smaller padding */
     border-radius: 8px;
-    min-height: 150px;
+    min-height: 120px; /* Smaller min-height */
     display: flex;
-    gap: -30px; /* Overlap effect */
+    gap: -20px; /* Less overlap for smaller cards */
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
@@ -172,16 +175,18 @@ h1 {
 #action-buttons {
     margin-top: 20px;
     display: flex;
-    gap: 15px;
+    flex-wrap: wrap; /* Allow buttons to wrap */
+    justify-content: center;
+    gap: 10px; /* Smaller gap for buttons */
 }
 
 button {
     background-color: #3498db;
     color: white;
     border: none;
-    padding: 12px 25px;
+    padding: 10px 20px; /* Smaller padding for buttons */
     border-radius: 5px;
-    font-size: 1em;
+    font-size: 0.9em; /* Smaller font size for buttons */
     cursor: pointer;
     transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Flatter shadow */
@@ -209,8 +214,8 @@ button:disabled {
     transition: all 0.7s ease-in-out; /* Animation duration */
     z-index: 1000; /* Ensure it's above other elements */
     opacity: 0; /* Start invisible */
-    width: 170px;
-    height: 261px;
+    width: 100px; /* Match smaller card width */
+    height: 150px; /* Match smaller card height */
     border-radius: 8px;
 }
 #game-log-area {
@@ -241,7 +246,7 @@ button:disabled {
     font-size: 0.9em;
     color: #ecf0f1;
     display: flex;
-    flex-direction: column-reverse; /* Newest messages at the bottom */
+    flex-direction: column; /* Newest messages at the bottom */
 }
 
 #game-log p {
@@ -262,7 +267,7 @@ button:disabled {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-width: 120px; /* Ensure enough space for suit name + emoji */
+    min-width: 100px; /* Smaller min-width for mobile */
 }
 
 #current-suit-indicator strong {
@@ -272,7 +277,7 @@ button:disabled {
 }
 
 #current-suit-value {
-    font-size: 1.2em;
+    font-size: 1.1em; /* Slightly smaller font size */
     font-weight: bold;
     text-transform: capitalize;
 }
@@ -294,29 +299,30 @@ button:disabled {
 .modal-content {
     background-color: #34495e;
     margin: auto;
-    padding: 30px;
+    padding: 20px; /* Smaller padding for modals on mobile */
     border: 1px solid #f1c40f;
     border-radius: 10px;
-    width: 80%;
-    max-width: 400px;
+    width: 90%; /* Wider modals on mobile */
+    max-width: 350px; /* Slightly smaller max-width */
     text-align: center;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .modal-content h2 {
     color: #f1c40f;
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* Smaller margin */
+    font-size: 1.3em; /* Smaller font size */
 }
 
 .modal-content input[type="text"] {
     width: calc(100% - 20px);
-    padding: 10px;
-    margin-bottom: 20px;
+    padding: 8px; /* Smaller padding */
+    margin-bottom: 15px; /* Smaller margin */
     border: 1px solid #7f8c8d;
     border-radius: 5px;
     background-color: #2c3e50;
     color: #ecf0f1;
-    font-size: 1em;
+    font-size: 0.9em; /* Smaller font size */
     box-sizing: border-box;
 }
 
@@ -327,14 +333,204 @@ button:disabled {
 .modal-content button {
     background-color: #2ecc71;
     color: white;
-    padding: 10px 20px;
+    padding: 8px 15px; /* Smaller padding */
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 0.9em; /* Smaller font size */
     transition: background-color 0.2s ease-in-out;
 }
 
-.modal-content button:hover {
-    background-color: #27ae60;
+    .modal-content button:hover {
+        background-color: #27ae60;
+    }
+
+    /* Media Queries for very small screens (e.g., phones in portrait) */
+    @media (max-width: 480px) {
+        h1 {
+            font-size: 1.5em;
+        }
+
+        #game-container {
+            padding: 15px;
+            gap: 15px;
+        }
+
+        #game-info {
+            padding: 10px 15px;
+            font-size: 1em;
+        }
+
+        #players-info {
+            gap: 10px;
+        }
+
+        .player-card {
+            min-width: 120px;
+            padding: 10px;
+        }
+
+        .player-card h3 {
+            font-size: 1em;
+        }
+
+        .player-card p {
+            font-size: 0.85em;
+        }
+
+        #game-area {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+
+
+        #discard-pile-area {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        #deck-area p, #discard-pile-area p {
+            font-size: 0.9em;
+        }
+
+        #player-hands {
+            gap: 5px;
+        }
+
+        .player-hand {
+            padding: 5px;
+            min-height: 100px;
+            gap: -15px; /* Adjust overlap for very small cards */
+        }
+
+        #action-buttons button {
+            width: 100%; /* Full width buttons */
+            padding: 8px 10px;
+            font-size: 0.85em;
+        }
+
+        #game-log-area {
+            padding: 10px;
+        }
+
+        #game-log {
+            height: 100px;
+            font-size: 0.8em;
+        }
+
+        #current-suit-indicator {
+            min-width: 80px;
+            padding: 5px;
+        }
+
+        #current-suit-value {
+            font-size: 1em;
+        }
+
+        .modal-content {
+            padding: 15px;
+            width: 95%;
+            max-width: 300px;
+        }
+
+        .modal-content h2 {
+            font-size: 1.2em;
+        }
+
+        .modal-content input[type="text"] {
+            padding: 6px;
+            font-size: 0.85em;
+        }
+
+        .modal-content button {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+    }
+/* Media Queries for larger screens */
+@media (min-width: 768px) {
+    body {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2.5em;
+    }
+
+    #game-container {
+        padding: 40px;
+        max-width: 1400px; /* Allow more width for desktop */
+    }
+
+    #game-area {
+        flex-direction: row; /* Arrange items horizontally */
+        gap: 80px;
+    }
+
+    .card-image {
+        width: 170px; /* Standard card width for desktop */
+        height: 261px; /* Standard card height for desktop */
+    }
+
+    #discard-pile-area {
+        flex-direction: column; /* Stack elements vertically */
+        gap: 10px;
+    }
+
+    .player-card {
+        min-width: 180px;
+    }
+
+    #game-log-area {
+        max-width: 1000px;
+    }
+
+    #player-hands {
+        gap: 20px;
+    }
+
+    .player-hand {
+        padding: 15px;
+        min-height: 150px;
+        gap: -30px;
+    }
+
+    #action-buttons {
+        gap: 15px;
+    }
+
+    button {
+        padding: 12px 25px;
+        font-size: 1em;
+    }
+
+    #current-suit-indicator {
+        min-width: 120px;
+    }
+
+    #current-suit-value {
+        font-size: 1.2em;
+    }
+
+    .modal-content {
+        padding: 30px;
+        max-width: 400px;
+    }
+
+    .modal-content h2 {
+        margin-bottom: 20px;
+        font-size: 1.5em;
+    }
+
+    .modal-content input[type="text"] {
+        padding: 10px;
+        margin-bottom: 20px;
+        font-size: 1em;
+    }
+
+    .modal-content button {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
 }

@@ -148,7 +148,7 @@ class Player {
             }
 
             if (cardToPlay.specialType === 'change_suit') {
-                chosenSuit = this._getMostCommonSuitInHand() || Object.values(SUITS)[0];
+                chosenSuit = this._getMostCommonSuitInHand(game.currentSuit) || Object.values(SUITS).filter(s => s !== game.currentSuit)[0];
             }
 
             animateCardFlight(cardToPlay, startElement, endElement, () => {
@@ -173,7 +173,7 @@ class Player {
                     // Juega la primera válida (simple)
                     cardToPlay = playableCards[0];
                     if (cardToPlay.specialType === 'change_suit') {
-                        chosenSuit = this._getMostCommonSuitInHand() || Object.values(SUITS)[0];
+                        chosenSuit = this._getMostCommonSuitInHand(game.currentSuit) || Object.values(SUITS).filter(s => s !== game.currentSuit)[0];
                     }
                     
                     animateCardFlight(cardToPlay, startElement, endElement, () => {
@@ -191,9 +191,12 @@ class Player {
         }
     }
 
-    _getMostCommonSuitInHand() {
+    _getMostCommonSuitInHand(excludedSuit = null) {
         const suitCounts = {};
         for (const card of this.hand) {
+            if (card.suit === excludedSuit) {
+                continue; // Skip the excluded suit
+            }
             suitCounts[card.suit] = (suitCounts[card.suit] || 0) + 1;
         }
         let mostCommonSuit = null;
@@ -315,25 +318,9 @@ class Game {
                     this.drawPenaltyCount = 2;
                     break;
                 case 'change_suit': // Rey
-                    logMessage(`¡La primera carta es un Rey! ${firstPlayer.name} debe elegir un nuevo palo.`);
-                    if (this.currentRound === 1) {
-                        this.firstRoundKingRuleActive = true;
-                        logMessage(`¡Es la primera ronda y salió un Rey! El jugador actual puede jugar cualquier carta excepto otro Rey.`);
-                    }
-                    let chosenSuit = null;
-                    if (firstPlayer.isAI) {
-                        chosenSuit = firstPlayer._getMostCommonSuitInHand() || Object.values(SUITS)[0];
-                        logMessage(`${firstPlayer.name} (IA) ha elegido ${chosenSuit}.`);
-                    } else {
-                        chosenSuit = await promptForSuitSelection(); // Use await for suit selection
-                        if (chosenSuit) {
-                            logMessage(`${firstPlayer.name} ha elegido ${chosenSuit}.`);
-                        } else {
-                            chosenSuit = firstCard.suit; // Fallback if selection is somehow cancelled
-                            logMessage('No se eligió palo, se mantiene el original.');
-                        }
-                    }
-                    this.currentSuit = chosenSuit;
+                    logMessage(`¡La primera carta es un Rey! ${firstPlayer.name} no elige un nuevo palo, pero puede jugar cualquier carta excepto otro Rey.`);
+                    this.firstRoundKingRuleActive = true;
+                    // The currentSuit is already set to firstCard.suit before the switch, which is correct for this rule.
                     break;
             }
 
@@ -536,15 +523,19 @@ class Game {
             updateUI();
 
             // After drawing, if the player still has no playable cards, their turn ends.
-            if (!this.hasPlayableCards(currentPlayer)) {
-                logMessage(`${currentPlayer.name} no tiene jugada después de robar y pasa el turno.`);
-                return true; // Indicate that the turn should end
-            }
+            // This part should NOT return true, as the turn should still advance to the next player.
+            // The current player has taken their penalty/action.
+            // The nextTurn() function will handle advancing to the next player.
+            // if (!this.hasPlayableCards(currentPlayer)) {
+            //     logMessage(`${currentPlayer.name} no tiene jugada después de robar y pasa el turno.`);
+            //     return true; // Indicate that the turn should end
+            // }
         }
         return false; // No penalty was active, no counter was played, or player can now play
     }
 
     nextTurn() {
+        gameMessageElement.textContent = ''; // Clear previous game messages
         // 1. Determine the base next player and handle skips
         let nextPlayerIndex = (this.activePlayerIndex + 1) % this.players.length;
         if (this.skipNextTurn) {
@@ -594,6 +585,7 @@ class Game {
 
     isValidMove(card) {
         const topCard = this.getTopDiscardCard();
+        console.log(`DEBUG: isValidMove - Evaluating card: ${card.toString()}, currentRank: ${this.currentRank}, currentSuit: ${this.currentSuit}`);
 
         // If a draw penalty is active, the only valid move is another 7
         if (this.drawPenaltyCount > 0) {
@@ -610,67 +602,86 @@ class Game {
         if (this.currentRank === SPECIAL_RANKS.REY) {
             // If the top card is a King, you cannot play another King.
             // You must play a card of the current suit (which was chosen by the previous King player).
-            return card.rank !== SPECIAL_RANKS.REY && card.suit === this.currentSuit;
+            const isValid = card.rank !== SPECIAL_RANKS.REY && card.suit === this.currentSuit;
+            console.log(`DEBUG: isValidMove - currentRank is REY. Card ${card.toString()} is valid: ${isValid}`);
+            return isValid;
         }
 
         // General rule: match suit, rank, or play a King (to change suit)
-        return card.suit === this.currentSuit || card.rank === this.currentRank || card.specialType === 'change_suit';
+        const isValid = card.suit === this.currentSuit || card.rank === this.currentRank || card.specialType === 'change_suit';
+        console.log(`DEBUG: isValidMove - General rule. Card ${card.toString()} is valid: ${isValid}`);
+        return isValid;
     }
 
     hasPlayableCards(player) {
-        return player.hand.some(card => this.isValidMove(card));
+        const playable = player.hand.filter(card => this.isValidMove(card));
+        if (!player.isAI) { // Only log for human player
+            console.log(`DEBUG: Playable cards for ${player.name}:`, playable.map(c => c.toString()));
+        }
+        return playable.length > 0;
     }
 
-    playCard(player, card, chosenSuit = null, force = false) {
-        if (!player.hand.includes(card)) {
-            throw new Error('La carta no está en la mano del jugador.');
+        playCard(player, card, chosenSuit = null, force = false) {
+            if (!player.hand.includes(card)) {
+                throw new Error('La carta no está en la mano del jugador.');
+            }
+    
+            // Se aplican las reglas normales de movimiento, a menos que se fuerce la jugada (para contraatacar un 7)
+            if (!this.isValidMove(card) && !force) {
+                throw new Error('Movimiento inválido. La carta no coincide con el palo o el número de la carta superior.');
+            }
+    
+            const previousSuit = this.currentSuit; // Store the suit before the card is played
+    
+            player.removeCard(card);
+            this.discardPile.push(card);
+            this.currentRank = card.rank; // Rank is always the card's rank
+    
+            logMessage(`${player.name} jugó ${card.toString()}`);
+    
+            // Aplicar efectos de cartas especiales
+            switch (card.specialType) {
+                case 'skip_turn':
+                    logMessage(`¡Sota! El siguiente jugador pierde su turno.`);
+                    this.skipNextTurn = true;
+                    this.currentSuit = card.suit; // Update suit for non-King cards
+                    break;
+                case 'change_suit':
+                    if (!chosenSuit || !Object.values(SUITS).includes(chosenSuit)) {
+                        throw new Error('Debes elegir un palo para el Rey.');
+                    }
+                    // New rule: cannot choose the previous suit
+                    if (chosenSuit === previousSuit) { // Compare with previousSuit
+                        throw new Error(`No puedes elegir el palo actual (${previousSuit}). Debes elegir un palo diferente.`);
+                    }
+                    this.currentSuit = chosenSuit; // Apply the chosen suit
+                    const kingMessage = `${player.name} lanzó ${card.toString()} y cambió el palo a ${chosenSuit}.`;
+                    gameMessageElement.textContent = kingMessage;
+                    logMessage(kingMessage);
+                    break;
+                case 'draw_two':
+                    this.drawPenaltyCount += 2;
+                    logMessage(`¡7! El siguiente jugador debe robar ${this.drawPenaltyCount} cartas.`);
+                    this.currentSuit = card.suit; // Update suit for non-King cards
+                    break;
+                default:
+                    this.currentSuit = card.suit; // Default for regular cards
+                    break;
+            }
+    
+            // Reset the first round King rule after a card has been played under it
+            if (this.firstRoundKingRuleActive) {
+                this.firstRoundKingRuleActive = false;
+                logMessage('La regla especial del Rey de la primera ronda ha sido desactivada.');
+            }
+    
+            // Comprobar si el jugador se quedó sin cartas para terminar la ronda
+            if (!player.hasCards()) {
+                this.endRound(player); // La ronda ha terminado, pasar el ganador
+                return true;
+            }
+            return false; // La ronda continúa
         }
-
-        // Se aplican las reglas normales de movimiento, a menos que se fuerce la jugada (para contraatacar un 7)
-        if (!this.isValidMove(card) && !force) {
-            throw new Error('Movimiento inválido. La carta no coincide con el palo o el número de la carta superior.');
-        }
-
-        player.removeCard(card);
-        this.discardPile.push(card);
-        this.currentSuit = card.suit;
-        this.currentRank = card.rank;
-
-        logMessage(`${player.name} jugó ${card.toString()}`);
-
-        // Aplicar efectos de cartas especiales
-        switch (card.specialType) {
-            case 'skip_turn':
-                logMessage(`¡Sota! El siguiente jugador pierde su turno.`);
-                this.skipNextTurn = true;
-                break;
-            case 'change_suit':
-                if (!chosenSuit || !Object.values(SUITS).includes(chosenSuit)) {
-                    throw new Error('Debes elegir un palo para el Rey.');
-                }
-                this.currentSuit = chosenSuit;
-                logMessage(`¡Rey! El palo ha cambiado a ${chosenSuit}.`);
-                break;
-            case 'draw_two':
-                this.drawPenaltyCount += 2;
-                logMessage(`¡7! El siguiente jugador debe robar ${this.drawPenaltyCount} cartas.`);
-                break;
-        }
-
-        // Reset the first round King rule after a card has been played under it
-        if (this.firstRoundKingRuleActive) {
-            this.firstRoundKingRuleActive = false;
-            logMessage('La regla especial del Rey de la primera ronda ha sido desactivada.');
-        }
-
-        // Comprobar si el jugador se quedó sin cartas para terminar la ronda
-        if (!player.hasCards()) {
-            this.endRound(player); // La ronda ha terminado, pasar el ganador
-            return true; 
-        }
-        return false; // La ronda continúa
-    }
-
     drawCards(player, count = 1) {
         for (let i = 0; i < count; i++) {
             if (this.deck.size === 0) {
@@ -734,8 +745,10 @@ function logMessage(message) {
     if (gameLogElement) {
         const p = document.createElement('p');
         p.textContent = message;
-        // Insert at the top, so it works with flex-direction: column-reverse
-        gameLogElement.insertBefore(p, gameLogElement.firstChild);
+        gameLogElement.appendChild(p); // Append to the end
+
+        // Scroll to the bottom to show the newest message
+        gameLogElement.scrollTop = gameLogElement.scrollHeight;
     }
 }
 
@@ -773,13 +786,31 @@ function animateCardFlight(card, startElement, endElement, callback) {
     }, 800); // Duración debe ser un poco menor que la transición en CSS para evitar parpadeo
 }
 
-function promptForSuitSelection() {
+function promptForSuitSelection(excludedSuit = null) {
     return new Promise(resolve => {
         suitSelectionElement.classList.remove('hidden');
         const suitButtons = suitSelectionElement.querySelectorAll('button');
 
+        // Reset button states
+        suitButtons.forEach(button => {
+            button.disabled = false;
+            button.classList.remove('disabled-suit');
+        });
+
+        if (excludedSuit) {
+            const excludedButton = Array.from(suitButtons).find(button => button.dataset.suit === excludedSuit);
+            if (excludedButton) {
+                excludedButton.disabled = true;
+                excludedButton.classList.add('disabled-suit');
+            }
+        }
+
         const handleSuitSelection = (event) => {
             const chosenSuit = event.target.dataset.suit;
+            if (chosenSuit === excludedSuit) {
+                alert(`No puedes elegir el palo actual (${excludedSuit}). Por favor, elige otro.`);
+                return; // Prevent selection and keep modal open
+            }
             suitSelectionElement.classList.add('hidden');
             suitButtons.forEach(button => button.removeEventListener('click', handleSuitSelection));
             resolve(chosenSuit);
@@ -808,7 +839,8 @@ async function handlePlayCard(e, card) { // Make it async
         try {
             let chosenSuit = null;
             if (card.specialType === 'change_suit') {
-                chosenSuit = await promptForSuitSelection(); // Use await for suit selection
+                const previousSuit = game.currentSuit; // Store the current suit before playing the King
+                chosenSuit = await promptForSuitSelection(previousSuit); // Pass previousSuit as excluded
                 if (!chosenSuit) {
                     // If the player cancels (though promptForSuitSelection doesn't allow cancel directly),
                     // or if there's an issue, reactivate UI and return.
@@ -821,7 +853,13 @@ async function handlePlayCard(e, card) { // Make it async
             updateUI(); // Actualiza la UI para que la carta desaparezca de la mano
 
             if (!roundEnded) {
-                game.nextTurn();
+                if (card.specialType === 'change_suit') {
+                    setTimeout(() => {
+                        game.nextTurn();
+                    }, 2000); // Delay for 2 seconds to read the message
+                } else {
+                    game.nextTurn();
+                }
             }
         } catch (error) {
             alert(error.message);
@@ -887,6 +925,7 @@ function updateUI() {
         }
         discardTopCardElement.src = `assets/cards/${filename}`;
         discardTopCardElement.alt = topDiscardCard.toString();
+        console.log(`DEBUG: Discard pile top card filename: ${filename}`);
     }
 
     // Update current suit indicator
@@ -896,10 +935,20 @@ function updateUI() {
             const suit = game.currentSuit;
             const suitName = suit.charAt(0).toUpperCase() + suit.slice(1);
             let suitEmoji = '';
-            if (suit === SUITS.OROS) suitEmoji = '🪙';
-            if (suit === SUITS.COPAS) suitEmoji = '🍷';
-            if (suit === SUITS.ESPADAS) suitEmoji = '⚔️';
-            if (suit === SUITS.BASTOS) suitEmoji = '🌿';
+            switch (suit) {
+                case SUITS.OROS:
+                    suitEmoji = '💰'; // Bolsa de dinero para Oros
+                    break;
+                case SUITS.COPAS:
+                    suitEmoji = '🍷'; // Copa de vino para Copas
+                    break;
+                case SUITS.ESPADAS:
+                    suitEmoji = '⚔️'; // Espadas cruzadas para Espadas
+                    break;
+                case SUITS.BASTOS:
+                    suitEmoji = '🌿'; // Trébol o rama para Bastos
+                    break;
+            }
             suitText = `${suitName} ${suitEmoji}`;
         }
         currentSuitValueElement.innerHTML = suitText;
@@ -1034,18 +1083,20 @@ drawCardButton.addEventListener('click', () => {
     const currentPlayer = game.getCurrentPlayer();
     if (currentPlayer.isAI) return;
 
-    drawCardButton.disabled = true; // Deshabilitar para evitar clics múltiples
+    drawCardButton.disabled = true; // Disable to prevent multiple clicks
     
-    // The drawCards function will log the specific card drawn
-    game.drawCards(currentPlayer, 1); // Roba 1 carta
+    game.drawCards(currentPlayer, 1); // Draw 1 card
 
-    // Después de robar, si sigue sin tener jugada, pasa el turno
-    if (!game.hasPlayableCards(currentPlayer)) {
-        logMessage(`${currentPlayer.name} no puede jugar y pasa el turno.`);
-        setTimeout(() => game.nextTurn(), 1500); // Pasa el turno automáticamente
-    } else {
-        // Ahora puede jugar. El botón de robar permanece deshabilitado para forzarle a jugar.
+    // After drawing, check if the player can now play
+    if (game.hasPlayableCards(currentPlayer)) {
         gameMessageElement.textContent = '¡Ahora tienes jugada!';
+        // The draw button should be disabled here to force the player to play
+        drawCardButton.disabled = true; // Ensure it's disabled
+    } else {
+        logMessage(`${currentPlayer.name} no puede jugar y pasa el turno.`);
+        // Re-enable the draw button if the player still cannot play after drawing
+        drawCardButton.disabled = false; // Enable the button so they can draw again if allowed by rules
+        setTimeout(() => game.nextTurn(), 1500); // Automatically pass turn after a delay
     }
 });
 
