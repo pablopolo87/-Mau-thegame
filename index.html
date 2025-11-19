@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAU</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>MAU</h1>
+    <div id="game-container">
+        <div id="game-info">
+            <p>Ronda: <span id="current-round">0</span></p>
+            <p>Turno de: <span id="current-player-name"></span></p>
+            <p id="game-message"></p>
+        </div>
+
+        <div id="players-info">
+            <!-- Información de cada jugador se renderizará aquí -->
+        </div>
+
+        <div id="game-area">
+            <div id="deck-area" class="card-pile">
+                <img id="deck-pile" class="card-image back" src="assets/cards/contraportada.png" alt="Card Back">
+                <p>Mazo (<span id="deck-size"></span>)</p>
+            </div>
+            <div id="discard-pile-area" class="card-pile">
+                <img id="discard-top-card" class="card-image">
+                <p>Descarte</p>
+                <div id="current-suit-indicator">
+                    <strong>Palo Actual:</strong>
+                    <span id="current-suit-value">N/A</span>
+                </div>
+                <button id="draw-card-button" disabled>Robar Carta</button>
+            </div>
+        </div>
+
+        <div id="player-hands">
+            <!-- Las manos de los jugadores se renderizarán aquí -->
+        </div>
+
+        <div id="action-buttons">
+            <button id="start-game-button">Iniciar Juego</button>
+        </div>
+
+        <div id="game-log-area">
+            <h2>Registro del Juego</h2>
+            <div id="game-log"></div>
+        </div>
+    </div>
+
+    <div id="suit-selection" class="modal hidden">
+        <div class="modal-content">
+            <p>Elige un palo:</p>
+            <button data-suit="oros">Oros</button>
+            <button data-suit="copas">Copas</button>
+            <button data-suit="espadas">Espadas</button>
+            <button data-suit="bastos">Bastos</button>
+        </div>
+    </div>
+
+    <div id="name-input-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Introduce tu nombre</h2>
+            <input type="text" id="player-name-input" placeholder="Tu nombre" maxlength="20">
+            <button id="confirm-name-button">Jugar</button>
+        </div>
+    </div>
+
+    <div id="lives-selection-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Elige el número de vidas</h2>
+            <button data-lives="2">2 Vidas</button>
+            <button data-lives="4">4 Vidas</button>
+            <button data-lives="6">6 Vidas</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
