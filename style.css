@@ -1,536 +1,564 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Quicksand', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 0;
-    padding: 10px; /* Smaller padding for mobile */
-    background-color: #1a1a1a; /* Very dark gray for room effect */
-    color: #ecf0f1; /* Light text color */
+    padding: 10px;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: #ecf0f1;
     min-height: 100vh;
     box-sizing: border-box;
 }
 
-h1 {
-    color: #f1c40f; /* Yellow accent */
-    margin-bottom: 15px; /* Smaller margin */
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    font-size: 1.8em; /* Smaller font size for mobile */
-}
-
-#game-container {
-    background-color: #285a3a; /* Darker green for table cloth */
-    border-radius: 15px; /* Slightly more rounded corners */
-    box-shadow: 0 12px 24px rgba(0,0,0,0.7); /* More pronounced shadow for depth */
-    border: 2px solid #4a8c6a; /* Subtle edge for the table */
-    padding: 30px;
-    width: 90%;
-    max-width: 1200px;
+#main-game-content {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Apilar la información de los jugadores y el área de juego */
     gap: 20px;
-    align-items: center;
-}
-
-#game-info {
-    text-align: center;
-    font-size: 1.1em;
-    background-color: #2c3e50;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
     width: 100%;
-    max-width: 600px;
-}
-
-#game-info p {
-    margin: 5px 0;
-}
-
-#game-message {
-    font-weight: bold;
-    color: #e74c3c; /* Red for important messages */
-    min-height: 1.5em;
+    max-width: 1600px;
+    margin-top: 20px;
+    align-items: center; /* Centrar los elementos hijos */
+    padding-bottom: 250px; /* Espacio para la mano del jugador en la parte inferior */
 }
 
 #players-info {
     display: flex;
-    justify-content: center;
+    flex-direction: row;
     flex-wrap: wrap;
     gap: 20px;
+    justify-content: center;
     width: 100%;
 }
 
-.player-card {
-    background-color: #2c3e50;
-    border: 2px solid #f1c40f;
-    border-radius: 8px;
-    padding: 15px;
+#center-sprawl {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#game-container {
+    background-color: #004d00;
+    border-radius: 150px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.7), inset 0 0 80px rgba(0,0,0,0.6);
+    border: 25px solid #4a3a2a;
+    padding: 50px;
+    flex-shrink: 1;
+    min-width: 700px;
+    max-width: 1000px;
+    aspect-ratio: 16 / 9;
+    position: relative; /* Sigue siendo relativo para el posicionamiento interno del mazo/descarte */
+}
+
+#game-info {
+    display: none; /* Eliminado a petición del usuario */
     text-align: center;
-    min-width: 150px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    transition: transform 0.2s ease-in-out;
+    font-size: 1em; /* Reducido de 1.2em */
+    background-color: rgba(44, 62, 80, 0.8);
+    padding: 10px 15px; /* Reducido de 20px 30px */
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 700px;
 }
 
-.player-card.active {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.5), 0 0 15px #f1c40f;
-}
-
-.player-card h3 {
-    margin-top: 0;
-    color: #3498db; /* Blue for player names */
-}
-
-.player-card p {
-    margin: 5px 0;
-    font-size: 0.95em;
+#game-message {
+    font-weight: bold;
+    color: #e74c3c;
+    min-height: 1.5em;
+    font-size: 1.1em;
 }
 
 #game-area {
-    display: flex;
-    justify-content: center;
-    gap: 50px;
-    margin: 30px 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100%;
-    flex-wrap: wrap; /* Allow game area to wrap on smaller screens */
+    height: 100%;
 }
+
+.player-card {
+    /* Se elimina el posicionamiento absoluto */
+    background: rgba(44, 62, 80, 0.9);
+    border: 3px solid #f1c40f;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    min-width: 180px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    transition: all 0.3s ease-in-out;
+    /* Se elimina transform: translate(-50%, -50%) */
+}
+
+.player-card.active {
+    transform: scale(1.1); /* Se elimina translate de aquí */
+    box-shadow: 0 12px 24px rgba(0,0,0,0.6), 0 0 25px #f1c40f;
+    z-index: 10;
+}
+
+
+.player-card h4 {
+    margin-top: 0;
+    color: #5dade2;
+    font-size: 1.3em;
+}
+
+.player-card p {
+    margin: 8px 0;
+    font-size: 1em;
+}
+
+.player-card-hand-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    margin-top: 10px;
+    padding: 0 10px; /* Añadir un poco de padding */
+}
+
+.stacked-cards-container {
+    position: relative;
+    width: 90px; /* Ancho para contener 5 cartas con 10px de offset */
+    height: 60px;
+}
+
+.stacked-card-back {
+    width: 40px;
+    height: 60px;
+    border: 1px solid #f1c40f;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    position: absolute;
+    top: 0;
+}
+
+.card-count-total {
+    font-size: 1.8em; /* Hacer el número más grande */
+    font-weight: bold;
+    color: #f1c40f;
+    -webkit-text-stroke: 1px black;
+    text-stroke: 1px black;
+}
+
+
+
+/* Las reglas .player-1 a .player-5 han sido eliminadas para usar flexbox */
 
 .card-pile {
     display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#deck-area {
     flex-direction: column;
-}
-
-#discard-pile-area {
-    display: flex;
-    flex-direction: row; /* Arrange items in a row */
     align-items: center;
-    gap: 20px; /* Space between card, indicator, and button */
-    justify-content: center;
-}
-
-#discard-pile-area .card-image {
-    margin-right: 0; /* Remove any default margin */
-}
-
-.card-image {
-    width: 70px; /* Smaller default card width for mobile */
-    height: 105px; /* Smaller default card height for mobile */
-    border: 2px solid #f1c40f;
-    border-radius: 8px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.5); /* More pronounced shadow for depth */
-    position: relative;
-    transition: transform 0.1s ease-in-out;
-    cursor: default; /* Cursor por defecto para cartas no jugables */
-}
-
-.card-image.back {
-    content: url('assets/cards/contraportada.png'); /* Usar content para reemplazar la imagen */
-    border-color: #c0392b;
-}
-
-.card-image.playable {
-    cursor: pointer;
-    border-color: #2ecc71; /* Borde verde para cartas jugables */
-    box-shadow: 0 0 20px 5px #2ecc71; /* More prominent glow */
-    transform: scale(1.03); /* Slightly larger to stand out */
-}
-
-.card-image.playable:hover {
-    transform: translateY(-8px) scale(1.08); /* More pronounced hover effect */
-}
-
-
-#player-hands {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px; /* Smaller gap for player hands on mobile */
-    width: 100%;
-}
-
-.player-hand {
-    border: 1px solid #555; /* Darker solid border */
-    padding: 10px; /* Smaller padding */
-    border-radius: 8px;
-    min-height: 120px; /* Smaller min-height */
-    display: flex;
-    gap: -20px; /* Less overlap for smaller cards */
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    background-color: rgba(0,0,0,0.3); /* Slightly darker background */
-}
-
-.player-hand.current-player-hand {
-    border-color: #3498db;
-    box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
-}
-
-#action-buttons {
-    margin-top: 20px;
-    display: flex;
-    flex-wrap: wrap; /* Allow buttons to wrap */
-    justify-content: center;
-    gap: 10px; /* Smaller gap for buttons */
-}
-
-button {
-    background-color: #3498db;
+    gap: 15px;
     color: white;
-    border: none;
-    padding: 10px 20px; /* Smaller padding for buttons */
-    border-radius: 5px;
-    font-size: 0.9em; /* Smaller font size for buttons */
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Flatter shadow */
-}
-
-button:hover:not(:disabled) {
-    background-color: #5dade2; /* Slightly brighter blue on hover */
-    transform: translateY(-2px);
-}
-
-button:disabled {
-    background-color: #7f8c8d;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-
-
-.hidden {
-    display: none !important;
-}
-
-.flying-card {
-    position: absolute;
-    transition: all 0.7s ease-in-out; /* Animation duration */
-    z-index: 1000; /* Ensure it's above other elements */
-    opacity: 0; /* Start invisible */
-    width: 100px; /* Match smaller card width */
-    height: 150px; /* Match smaller card height */
-    border-radius: 8px;
-}
-#game-log-area {
-    width: 90%;
-    max-width: 800px;
-    margin-top: 20px;
-    background-color: #2c3e50;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
-}
-
-#game-log-area h2 {
-    margin-top: 0;
-    text-align: center;
-    color: #f1c40f;
-    font-size: 1.2em;
-}
-
-#game-log {
-    height: 150px;
-    overflow-y: auto;
-    background-color: #34495e;
-    border: 1px solid #2c3e50;
-    border-radius: 5px;
-    padding: 10px;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.9em;
-    color: #ecf0f1;
-    display: flex;
-    flex-direction: column; /* Newest messages at the bottom */
-}
-
-#game-log p {
-    margin: 0 0 5px;
-    padding: 0;
-    border-bottom: 1px solid #4a637b;
-    padding-bottom: 5px;
-}
-
-#current-suit-indicator {
-    margin-top: 0; /* Remove top margin */
-    padding: 10px;
-    background-color: #2c3e50;
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-    display: flex; /* Use flex for internal alignment */
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 100px; /* Smaller min-width for mobile */
-}
+        text-shadow: 1px 1px 3px black;
+    }
+    
+    #deck-area {
+        position: absolute;
+        top: 50%;
+        left: 35%;
+        transform: translate(-50%, -50%);
+    }
+    
+    #discard-pile-area {
+        position: absolute;
+        top: 50%;
+        left: 65%;
+        transform: translate(-50%, -50%);
+    }
+    
+    .card-image {
+        width: 120px;
+        height: 180px;
+        border: 3px solid #f1c40f;
+        border-radius: 10px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .card-image.back {
+        content: url('assets/cards/contraportada.png');
+        border-color: #e74c3c;
+    }
+    
+    .card-image.playable {
+        cursor: pointer;
+        border-color: #2ecc71;
+        box-shadow: 0 0 25px 8px #2ecc71;
+        transform: scale(1.05);
+    }
+    
+    .card-image.playable:hover {
+        transform: translateY(-10px) scale(1.1);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.4), 0 0 30px 10px #2ecc71;
+    }
+    
+    #human-player-hand-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 25px;
+        background: rgba(0, 0, 0, 0.6);
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        box-sizing: border-box;
+        border-top: 2px solid #f1c40f;
+    }
+    
+    #human-player-hand-area .hand-cards {
+        display: flex;
+        gap: -40px;
+    }
+    
+    #action-buttons {
+        margin-top: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        position: relative; /* Ensure z-index works */
+        z-index: 10; /* Bring buttons to the front */
+    }
+    
+    button {
+        background: linear-gradient(to right, #56ab2f, #a8e063);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 1em;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        text-transform: uppercase;
+    }
+    
+    button:hover:not(:disabled) {
+        background: linear-gradient(to right, #a8e063, #56ab2f);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    }
+    
+    button:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+    
+    .flying-card {
+        position: absolute;
+        transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+        z-index: 1000;
+        opacity: 0;
+        width: 120px;
+        height: 180px;
+        border-radius: 10px;
+    }
+    
+    h1 {
+        color: #f1c40f;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+        font-size: 2.5em;
+        font-weight: 700;
+    }
+    
+    #game-log-area {
+        display: flex; /* Siempre visible */        flex: 1; /* Take up 1 part of remaining space */
+        background-color: rgba(44, 62, 80, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        min-width: 250px; /* Slightly smaller min-width */
+        max-width: 400px; /* Slightly smaller max-width */
+        flex-direction: column; /* Stack children vertically */
+    }
+    
+        
+    #game-log-area h2 {
+        margin-top: 0;
+        text-align: center;
+        color: #f1c40f;
+        font-size: 1.4em;
+    }
+    
+    #game-log {
+        flex-grow: 1; /* Allow it to grow and fill available space */
+        height: auto; /* Allow height to be determined by content and flex-grow */
+        max-height: 100%; /* Ensure it doesn't overflow its parent */
+        overflow-y: auto;
+        background-color: rgba(52, 73, 94, 0.9);
+        border: 2px solid #2c3e50;
+        border-radius: 10px;
+        padding: 15px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 1em;
+        color: #ecf0f1;
+    }
+    
+    #game-log p {
+        margin: 0 0 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #4a637b;
+    }
+    
+    #current-suit-indicator {
+        margin-top: 10px;
+        padding: 15px;
+        background-color: rgba(44, 62, 80, 0.8);
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        min-width: 150px;
+    }
 
 #current-suit-indicator strong {
     color: #f1c40f;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    font-size: 1.1em;
 }
 
 #current-suit-value {
-    font-size: 1.1em; /* Slightly smaller font size */
+    font-size: 1.3em;
     font-weight: bold;
-    text-transform: capitalize;
 }
 
-/* Modal Styles */
 .modal {
     position: fixed;
-    z-index: 1001; /* Above other elements */
+    z-index: 1001;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
+    backdrop-filter: blur(5px);
 }
 
 .modal-content {
-    background-color: #34495e;
+    background: linear-gradient(to right, #434343, #000000);
     margin: auto;
-    padding: 20px; /* Smaller padding for modals on mobile */
-    border: 1px solid #f1c40f;
-    border-radius: 10px;
-    width: 90%; /* Wider modals on mobile */
-    max-width: 350px; /* Slightly smaller max-width */
+    padding: 30px;
+    border: 2px solid #f1c40f;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 450px;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
 .modal-content h2 {
     color: #f1c40f;
-    margin-bottom: 15px; /* Smaller margin */
-    font-size: 1.3em; /* Smaller font size */
+    margin-bottom: 25px;
+    font-size: 1.8em;
 }
 
 .modal-content input[type="text"] {
-    width: calc(100% - 20px);
-    padding: 8px; /* Smaller padding */
-    margin-bottom: 15px; /* Smaller margin */
-    border: 1px solid #7f8c8d;
-    border-radius: 5px;
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 2px solid #7f8c8d;
+    border-radius: 10px;
     background-color: #2c3e50;
     color: #ecf0f1;
-    font-size: 0.9em; /* Smaller font size */
+    font-size: 1.1em;
     box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
 }
 
-.modal-content input[type="text"]::placeholder {
-    color: #bdc3c7;
+.modal-content input[type="text"]:focus {
+    border-color: #f1c40f;
+    outline: none;
+    box-shadow: 0 0 10px #f1c40f;
 }
 
 .modal-content button {
-    background-color: #2ecc71;
+    background: linear-gradient(to right, #ff416c, #ff4b2b);
     color: white;
-    padding: 8px 15px; /* Smaller padding */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em; /* Smaller font size */
-    transition: background-color 0.2s ease-in-out;
+    padding: 12px 25px;
+    border-radius: 20px;
+    font-size: 1.1em;
 }
 
-    .modal-content button:hover {
-        background-color: #27ae60;
-    }
+.modal-content button:hover {
+    background: linear-gradient(to right, #ff4b2b, #ff416c);
+}
 
-    /* Media Queries for very small screens (e.g., phones in portrait) */
-    @media (max-width: 480px) {
-        h1 {
-            font-size: 1.5em;
-        }
+/* Estilos específicos para el modal de reglas */
+#rules-modal .modal-content {
+    max-width: 800px; /* Aumentar el ancho para las reglas */
+    padding: 30px; /* Ajustar el padding */
+    text-align: left; /* Alinear texto a la izquierda para mejor lectura */
+    max-height: 80vh; /* Limitar la altura del modal */
+    overflow-y: auto; /* Habilitar scroll si el contenido excede la altura */
+}
 
-        #game-container {
-            padding: 15px;
-            gap: 15px;
-        }
+#rules-modal .modal-content h2 {
+    font-size: 2.2em; /* Título principal más grande */
+    margin-bottom: 25px;
+    text-align: center; /* Centrar el título */
+    color: #f1c40f;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+}
 
-        #game-info {
-            padding: 10px 15px;
-            font-size: 1em;
-        }
+#game-rules-content h3 {
+    font-size: 1.6em; /* Subtítulos de sección */
+    color: #5dade2;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(241, 196, 15, 0.3);
+    padding-bottom: 5px;
+}
 
-        #players-info {
-            gap: 10px;
-        }
+#game-rules-content ul {
+    list-style-type: disc;
+    margin-left: 30px;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    line-height: 1.6;
+}
 
-        .player-card {
-            min-width: 120px;
-            padding: 10px;
-        }
+#game-rules-content ul ul {
+    list-style-type: circle;
+    margin-left: 20px;
+    font-size: 1em;
+}
 
-        .player-card h3 {
-            font-size: 1em;
-        }
+#game-rules-content li {
+    margin-bottom: 8px;
+}
 
-        .player-card p {
-            font-size: 0.85em;
-        }
+#game-rules-content p {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    line-height: 1.5;
+}
 
-        #game-area {
-            flex-direction: column;
-            gap: 20px;
-        }
+#game-rules-content strong {
+    color: #f1c40f;
+}
 
+#rules-modal #close-rules-button {
+    margin-top: 30px; /* Separar el botón de cerrar del contenido */
+    background: linear-gradient(to right, #e74c3c, #c0392b); /* Un color más llamativo para cerrar */
+    padding: 15px 40px;
+    font-size: 1.2em;
+    border-radius: 30px;
+}
 
+#rules-modal #close-rules-button:hover {
+    background: linear-gradient(to right, #c0392b, #e74c3c);
+    transform: translateY(-5px);
+}
 
-        #discard-pile-area {
-            flex-direction: column;
-            gap: 5px;
-        }
+@media (max-width: 768px) {
+    h1 { font-size: 2em; }
+    .card-image { width: 100px; height: 150px; }
+    #human-player-hand-area .hand-cards { gap: -30px; }
+    .player-card { min-width: 140px; padding: 15px; }
+}
 
-        #deck-area p, #discard-pile-area p {
-            font-size: 0.9em;
-        }
+@media (max-width: 480px) {
+    h1 { font-size: 1.8em; }
+    .card-image { width: 80px; height: 120px; }
+    #human-player-hand-area .hand-cards { gap: -20px; }
+    .player-card { min-width: 120px; padding: 10px; }
+    button { padding: 12px 25px; font-size: 0.9em; }
+    .modal-content { padding: 20px; }
+}
 
-        #player-hands {
-            gap: 5px;
-        }
+.hidden {
+    display: none;
+}
 
-        .player-hand {
-            padding: 5px;
-            min-height: 100px;
-            gap: -15px; /* Adjust overlap for very small cards */
-        }
-
-        #action-buttons button {
-            width: 100%; /* Full width buttons */
-            padding: 8px 10px;
-            font-size: 0.85em;
-        }
-
-        #game-log-area {
-            padding: 10px;
-        }
-
-        #game-log {
-            height: 100px;
-            font-size: 0.8em;
-        }
-
-        #current-suit-indicator {
-            min-width: 80px;
-            padding: 5px;
-        }
-
-        #current-suit-value {
-            font-size: 1em;
-        }
-
-        .modal-content {
-            padding: 15px;
-            width: 95%;
-            max-width: 300px;
-        }
-
-        .modal-content h2 {
-            font-size: 1.2em;
-        }
-
-        .modal-content input[type="text"] {
-            padding: 6px;
-            font-size: 0.85em;
-        }
-
-        .modal-content button {
-            padding: 6px 12px;
-            font-size: 0.85em;
-        }
-    }
-/* Media Queries for larger screens */
-@media (min-width: 768px) {
-    body {
-        padding: 20px;
-    }
-
-    h1 {
-        font-size: 2.5em;
+@media (max-width: 768px) {
+    #center-sprawl {
+        flex-direction: column;
+        align-items: center;
     }
 
     #game-container {
-        padding: 40px;
-        max-width: 1400px; /* Allow more width for desktop */
-    }
-
-    #game-area {
-        flex-direction: row; /* Arrange items horizontally */
-        gap: 80px;
-    }
-
-    .card-image {
-        width: 170px; /* Standard card width for desktop */
-        height: 261px; /* Standard card height for desktop */
-    }
-
-    #discard-pile-area {
-        flex-direction: column; /* Stack elements vertically */
-        gap: 10px;
-    }
-
-    .player-card {
-        min-width: 180px;
+        border: 10px solid #4a3a2a; /* Reducido de 25px */
+        padding: 10px; /* Reducido de 50px */
+        width: 95%; /* Ocupa la mayor parte del ancho */
+        max-width: none; /* Permite que se encoja */
+        max-height: calc(100vh - 300px); /* Estimación para dejar espacio a otros elementos */
+        box-sizing: border-box; /* Para que padding y border no aumenten el ancho */
     }
 
     #game-log-area {
-        max-width: 1000px;
+        min-width: unset; /* Eliminar restricción de ancho mínimo */
+        max-width: unset; /* Eliminar restricción de ancho máximo */
+        width: 95%; /* Adaptarse al ancho de la pantalla */
     }
 
-    #player-hands {
-        gap: 20px;
+    .card-image {
+        width: 80px; /* Reducido de 120px */
+        height: 120px; /* Reducido de 180px */
+        border: 2px solid #f1c40f; /* Reducido de 3px */
+        border-radius: 8px; /* Ligeramente reducido */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Sombra más pequeña */
     }
 
-    .player-hand {
-        padding: 15px;
-        min-height: 150px;
-        gap: -30px;
+    .player-card {
+        min-width: 120px; /* Reducido de 180px */
+        padding: 10px; /* Reducido de 15px */
     }
 
-    #action-buttons {
-        gap: 15px;
+    /* Ajustes para la mano del jugador para pantallas pequeñas */
+    #human-player-hand-area {
+        padding: 15px; /* Reducir el padding de la mano */
     }
 
-    button {
-        padding: 12px 25px;
-        font-size: 1em;
+    #human-player-hand-area .hand-cards {
+        gap: -20px; /* Reducir el solapamiento de las cartas en la mano */
     }
 
-    #current-suit-indicator {
-        min-width: 120px;
+    /* Reducir el tamaño de las fuentes para que quepa más contenido */
+    body {
+        font-size: 0.9em;
     }
 
-    #current-suit-value {
-        font-size: 1.2em;
+    h1 {
+        font-size: 1.8em;
     }
 
-    .modal-content {
-        padding: 30px;
-        max-width: 400px;
+    .player-card h4 {
+        font-size: 1.1em;
     }
 
-    .modal-content h2 {
-        margin-bottom: 20px;
-        font-size: 1.5em;
+    .player-card p {
+        font-size: 0.9em;
     }
 
-    .modal-content input[type="text"] {
-        padding: 10px;
-        margin-bottom: 20px;
-        font-size: 1em;
+    #game-info {
+        padding: 8px 10px;
+        font-size: 0.9em;
     }
 
-    .modal-content button {
-        padding: 10px 20px;
-        font-size: 1em;
+    #action-buttons button {
+        padding: 10px 15px;
+        font-size: 0.8em;
     }
+}
 }

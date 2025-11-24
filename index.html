@@ -8,46 +8,47 @@
 </head>
 <body>
     <h1>MAU</h1>
-    <div id="game-container">
-        <div id="game-info">
-            <p>Ronda: <span id="current-round">0</span></p>
-            <p>Turno de: <span id="current-player-name"></span></p>
-            <p id="game-message"></p>
-        </div>
+    <div id="action-buttons">
+        <button id="start-game-button">Iniciar Juego</button>
+        <button id="show-rules-button">Reglas del Juego</button>
 
+
+    </div>
+    <div id="game-info">
+        <p>Ronda: <span id="current-round">0</span></p>
+        <p>Turno de: <span id="current-player-name"></span></p>
+        <p id="game-message"></p>
+    </div>
+    <div id="main-game-content">
         <div id="players-info">
-            <!-- Información de cada jugador se renderizará aquí -->
+            <!-- La información de los jugadores de la IA se renderizará aquí -->
         </div>
-
-        <div id="game-area">
-            <div id="deck-area" class="card-pile">
-                <img id="deck-pile" class="card-image back" src="assets/cards/contraportada.png" alt="Card Back">
-                <p>Mazo (<span id="deck-size"></span>)</p>
-            </div>
-            <div id="discard-pile-area" class="card-pile">
-                <img id="discard-top-card" class="card-image">
-                <p>Descarte</p>
-                <div id="current-suit-indicator">
-                    <strong>Palo Actual:</strong>
-                    <span id="current-suit-value">N/A</span>
+        <div id="center-sprawl">
+            <div id="game-container">
+                <div id="game-area">
+                    <div id="deck-area" class="card-pile">
+                        <img id="deck-pile" class="card-image back" src="assets/cards/contraportada.png" alt="Card Back">
+                        <p>Mazo (<span id="deck-size"></span>)</p>
+                    </div>
+                    <div id="discard-pile-area" class="card-pile">
+                        <img id="discard-top-card" class="card-image">
+                        <p>Descarte</p>
+                        <div id="current-suit-indicator">
+                            <strong>Palo Actual:</strong>
+                            <span id="current-suit-value">N/A</span>
+                        </div>
+                        <button id="draw-card-button" disabled>Robar Carta</button>
+                    </div>
                 </div>
-                <button id="draw-card-button" disabled>Robar Carta</button>
             </div>
-        </div>
+            <div id="game-log-area">
+                <h2>Registro del Juego</h2>
+                <div id="game-log"></div>
+            </div>
 
-        <div id="player-hands">
-            <!-- Las manos de los jugadores se renderizarán aquí -->
-        </div>
-
-        <div id="action-buttons">
-            <button id="start-game-button">Iniciar Juego</button>
-        </div>
-
-        <div id="game-log-area">
-            <h2>Registro del Juego</h2>
-            <div id="game-log"></div>
         </div>
     </div>
+    <div id="human-player-hand-area"></div>
 
     <div id="suit-selection" class="modal hidden">
         <div class="modal-content">
@@ -75,6 +76,118 @@
             <button data-lives="6">6 Vidas</button>
         </div>
     </div>
+
+    <div id="ai-player-selection-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Elige el número de jugadores IA</h2>
+            <button data-ai-players="1">1 IA</button>
+            <button data-ai-players="2">2 IA</button>
+            <button data-ai-players="3">3 IA</button>
+            <button data-ai-players="4">4 IA</button>
+        </div>
+    </div>
+
+    <div id="ai-difficulty-selection-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Elige la dificultad de la IA</h2>
+            <button data-difficulty="easy">Fácil</button>
+            <button data-difficulty="medium">Medio</button>
+            <button data-difficulty="hard">Difícil</button>
+        </div>
+    </div>
+
+    <div id="random-name-selection-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>¿Nombres aleatorios para la IA?</h2>
+            <button id="random-names-yes">Sí</button>
+            <button id="random-names-no">No</button>
+        </div>
+    </div>
+
+    <div id="ai-name-selection-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Elige los nombres de los jugadores IA</h2>
+            <form id="ai-name-form"></form>
+            <button id="start-game-from-names-button">Iniciar Juego</button>
+        </div>
+    </div>
+
+    <div id="seven-oros-selection-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>¿Jugar con la carta especial 7 de oros?</h2>
+            <button id="seven-oros-yes">Sí</button>
+            <button id="seven-oros-no">No</button>
+        </div>
+    </div>
+
+    <div id="music-selection-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>¿Jugar con música?</h2>
+            <label for="volume-slider">Volumen:</label>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5">
+            <button id="music-yes">Sí</button>
+            <button id="music-no">No</button>
+        </div>
+    </div>
+
+    <div id="round-summary-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="round-summary-title">Fin de la Ronda</h2>
+            <div id="round-summary-content"></div>
+            <button id="next-round-button">Continuar</button>
+        </div>
+    </div>
+
+    <div id="rules-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Reglas del Juego</h2>
+            <div id="game-rules-content">
+                <h2>Reglas Rápidas de MAU</h2>
+
+                <h3>Objetivo</h3>
+                <ul>
+                    <li>Sé el último jugador en pie. Cada jugador tiene un número de vidas.</li>
+                    <li>Pierdes una vida si al final de una ronda eres el jugador con más puntos en la mano (sin contar al ganador de la ronda).</li>
+                </ul>
+
+                <h3>Cómo Jugar</h3>
+                <ul>
+                    <li>Cada ronda, recibes 4 cartas.</li>
+                    <li>Tu turno: Juega una carta que coincida en PALO o NÚMERO con la última carta en la pila de descarte.</li>
+                    <li>Si no puedes jugar: Roba una carta del mazo. Si aún no puedes jugar, pasas tu turno.</li>
+                </ul>
+
+                <h3>Cartas Especiales</h3>
+                <ul>
+                    <li><strong>Sota (Valor 10):</strong> El siguiente jugador pierde su turno.</li>
+                    <li><strong>Rey (Valor 12):</strong> Cuando juegas un Rey, eliges un nuevo PALO para el juego. (¡No puedes elegir el palo actual!).
+                        <ul>
+                            <li>*Excepción de Inicio:* Si un Rey es la primera carta de la ronda, no se elige palo. Solo significa que el primer jugador puede jugar cualquier carta excepto otro Rey.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Siete (Valor 7):</strong> El siguiente jugador debe robar 2 cartas. Este efecto se acumula si se juegan varios 7.
+                        <ul>
+                            <li>*Contra-Siete:* Si te toca robar por un 7, puedes jugar tu propio 7 para pasar la penalización (¡y sumar otras 2 cartas!) al siguiente jugador.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>Puntuación (para perder una vida)</h3>
+                <p>Al final de la ronda, si no ganaste:</p>
+                <ul>
+                    <li>As (1), Sota (10), Caballo (11): 11 puntos cada una.</li>
+                    <li>Siete (7), Rey (12): 20 puntos cada una.</li>
+                    <li>Otras cartas (2, 3, 4, 5, 6): Su valor nominal.</li>
+                </ul>
+
+                <h3>El Mazo</h3>
+                <p>Se usan dos barajas españolas (sin 8s ni 9s). Si el mazo se acaba, la pila de descarte (excepto la última carta) se baraja y se convierte en el nuevo mazo.</p>
+            </div>
+            <button id="close-rules-button">Cerrar</button>
+        </div>
+    </div>
+
+
 
     <script src="script.js"></script>
 </body>
